@@ -53,7 +53,7 @@ class ActionView::Helpers::FormBuilder
     class_eval src, __FILE__, __LINE__
   end
 
-  # Similar to the dl_x form helpers but without the DL DT DD
+  # Similar to the dl_x form helpers but uses SPAN instead of DL/DT/DD
   FORM_FIELDS.each do |selector|
     src = <<-SRC
       def labeled_#{selector}(method, options = {})
@@ -85,6 +85,23 @@ class ActionView::Helpers::FormBuilder
     @template.content_tag('dt', label_for(method, options.except(:required, :height, :width, :rows, :cols)) + required_label(options[:required])) + 
     @template.content_tag('dd', dd_content)
   end
+  
+  # Removes the hidden input field from the rendered output
+  def dl_check_box(method, options = {})
+    check_box_tag_with_input  = self.send(:check_box, method, options.except(:required))
+    check_box_tag_only        = check_box_tag_with_input.gsub(/<input[^>]*type=\"hidden\".*\/>/xi, '')
+
+    if object.respond_to?(:errors) && object.errors.respond_to?(:on) && object.errors.on(method)
+      output = @template.content_tag('dt', label_for(method, options.except(:required)) + required_label(options[:required]), :class => "error")
+      Array(object.errors.on(method)).each do |error|
+        output += @template.content_tag('dt', error, :class => "error msg")
+      end
+      output + @template.content_tag('dd', check_box_tag_only, :class => "error")
+    else
+      @template.content_tag('dt', label_for(method, options.except(:required)) + required_label(options[:required])) +
+      @template.content_tag('dd', check_box_tag_only)
+    end
+  end  
   
   def dl_file_uploader(name, options = {})
     dd_content = if (object == object.send(name) && object.respond_to?(:has_uploaded_data?) && object.has_uploaded_data?) || (object != object.send(name) && object.send(name) && object.send(name).id)

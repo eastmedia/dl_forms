@@ -1,0 +1,39 @@
+= dl_forms - Form Helper methods for Rails apps that leverage semantic HTML
+ 
+  http://github.com/eastmedia/dl_forms
+ 
+* mailto:matt@eastmedia.com
+ 
+== DESCRIPTION:
+
+Generates form helper methods that use Dictionary List (DL) HTML tags. They
+mostly just wrap Rails' default methods with DL/DT/DD tags. With the correct 
+CSS they look great and are incredibly helpful for fast form-building.
+
+These helper methods will also handle error messages at the field level. Also
+looks great when styled properly.
+
+== REQUIREMENTS:
+ 
+* Rails >= 2.0.1
+ 
+== INSTALL:
+ 
+Put the dl_forms.rb file in your app/helpers directory.
+
+In your app/helpers/application_helper.rb:
+  
+  require "dl_forms"
+  
+== CREDITS:
+
+Initial code by Jeff Boulet, Bryan Helmkamp, Matt Pelletier at Eastmedia
+ 
+== HISTORY:
+ 
+See CHANGELOG in this directory.
+
+== LICENSE:
+ 
+Copyright (c) 2008 Matt Pelletier, Eastmedia (eastmedia.com)
+See MIT-LICENSE in this directory.

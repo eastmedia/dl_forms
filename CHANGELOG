@@ -1,0 +1,7 @@
+== 0.1.0 / 2008-04-08
+
+* Include README, CHANGELOG, MIT-LICENSE
+* Explicitly define dl_check_box so we can remove the hidden input that Rails 
+  likes to insert. Will make default uses of validates_acceptance_of fail 
+  (because form submissions will no longer include a "0" value for the 
+  attribute).
