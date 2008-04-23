@@ -39,29 +39,31 @@ class ActionView::Helpers::FormBuilder
     src = <<-SRC
       def dl_#{selector}(method, options = {})
         if object.respond_to?(:errors) && object.errors.respond_to?(:on) && object.errors.on(method)
-          output = @template.content_tag('dt', label_for(method, options.except(:required)) + required_label(options[:required]), :class => "error")
+          errors = ""
           Array(object.errors.on(method)).each do |error|
-            output += @template.content_tag('dt', error, :class => "error msg")
+            errors += @template.content_tag(:span, error, :class => "error msg")
           end
-          output + @template.content_tag('dd', #{selector}(method, options.except(:required)), :class => "error")
+          output = @template.content_tag(:dt, label_for(method, options.except(:required)) + required_label(options[:required]) + errors, :class => "error")
+          output + @template.content_tag(:dd, #{selector}(method, options.except(:required)), :class => "error")
         else
-          @template.content_tag('dt', label_for(method, options.except(:required, :include_blank, :height, :width, :rows, :cols, :end_year, :start_year, :order)) + required_label(options[:required]), :class => options[:class]) +
-          @template.content_tag('dd', #{selector}(method, options.except(:required, :text)), :class => options[:class])
+          @template.content_tag(:dt, label_for(method, options.except(:required, :include_blank, :height, :width, :rows, :cols, :end_year, :start_year, :order)) + required_label(options[:required]), :class => options[:class]) +
+          @template.content_tag(:dd, #{selector}(method, options.except(:required, :text)), :class => options[:class])
         end
       end
     SRC
     class_eval src, __FILE__, __LINE__
   end
-
+  
   # Similar to the dl_x form helpers but uses SPAN instead of DL/DT/DD
   FORM_FIELDS.each do |selector|
     src = <<-SRC
       def labeled_#{selector}(method, options = {})
         if object.respond_to?(:errors) && object.errors.respond_to?(:on) && object.errors.on(method)
-          output = @template.content_tag(:span, label_for(method, options.except(:required)) + required_label(options[:required]), :class => "error")
+          errors = ""
           Array(object.errors.on(method)).each do |error|
-            output += @template.content_tag(:span, error, :class => "error msg")
+            errors += @template.content_tag(:span, error, :class => "error msg")
           end
+          output = @template.content_tag(:span, label_for(method, options.except(:required)) + required_label(options[:required]) + errors, :class => "error")
           output + #{selector}(method, options.except(:required))
         else
           label_for(method, options.except(:required, :include_blank, :height, :width, :rows, :cols, :end_year, :start_year, :order)) + 
@@ -82,8 +84,8 @@ class ActionView::Helpers::FormBuilder
     
     dd_content = @template.text_area(@object_name, method, widg_options)
 
-    @template.content_tag('dt', label_for(method, options.except(:required, :height, :width, :rows, :cols)) + required_label(options[:required])) + 
-    @template.content_tag('dd', dd_content)
+    @template.content_tag(:dt, label_for(method, options.except(:required, :height, :width, :rows, :cols)) + required_label(options[:required])) + 
+    @template.content_tag(:dd, dd_content)
   end
   
   # Removes the hidden input field from the rendered output
@@ -92,14 +94,15 @@ class ActionView::Helpers::FormBuilder
     check_box_tag_only        = check_box_tag_with_input.gsub(/<input[^>]*type=\"hidden\".*\/>/xi, '')
 
     if object.respond_to?(:errors) && object.errors.respond_to?(:on) && object.errors.on(method)
-      output = @template.content_tag('dt', label_for(method, options.except(:required)) + required_label(options[:required]), :class => "error")
+      errors = ""
       Array(object.errors.on(method)).each do |error|
-        output += @template.content_tag('dt', error, :class => "error msg")
+        errors += @template.content_tag(:dt, error, :class => "error msg")
       end
-      output + @template.content_tag('dd', check_box_tag_only, :class => "error")
+      output = @template.content_tag(:dt, label_for(method, options.except(:required)) + required_label(options[:required]) + errors, :class => "error")
+      output + @template.content_tag(:dd, check_box_tag_only, :class => "error")
     else
-      @template.content_tag('dt', label_for(method, options.except(:required)) + required_label(options[:required])) +
-      @template.content_tag('dd', check_box_tag_only)
+      @template.content_tag(:dt, label_for(method, options.except(:required)) + required_label(options[:required])) +
+      @template.content_tag(:dd, check_box_tag_only)
     end
   end  
   
@@ -122,69 +125,67 @@ class ActionView::Helpers::FormBuilder
       file_field("#{name}_uploaded_data", options.except(:url))
     end
     
-    @template.content_tag('dt', label_for(name, options.except(:url, :required)) + required_label(options[:required])) + 
-    @template.content_tag('dd', dd_content, :id => "#{name}_uploader")
+    @template.content_tag(:dt, label_for(name, options.except(:url, :required)) + required_label(options[:required])) + 
+    @template.content_tag(:dd, dd_content, :id => "#{name}_uploader")
   end
   
   def dl_file_field(method, options = {})
     if object.respond_to?(:errors) && object.errors.respond_to?(:on) && object.errors.on(method)
-      output = @template.content_tag('dt', label_for(method, options.except(:required)) + required_label(options[:required]), :class => "error")
+      errors = ""
       Array(object.errors.on(method)).each do |error|
-        output += @template.content_tag('dt', error, :class => "error msg")
+        errors += @template.content_tag(:dt, error, :class => "error msg")
       end
-      output + @template.content_tag('dd', file_field(method, options.except(:required)), :id => 'file_field', :class => "error")
+      output = @template.content_tag(:dt, label_for(method, options.except(:required)) + required_label(options[:required]) + errors, :class => "error")
+      output + @template.content_tag(:dd, file_field(method, options.except(:required)), :id => 'file_field', :class => "error")
     else
-      @template.content_tag('dt', label_for(method, options.except(:required)) + required_label(options[:required])) +
-      @template.content_tag('dd', file_field(method, options.except(:required)), :id => 'file_field')
+      @template.content_tag(:dt, label_for(method, options.except(:required)) + required_label(options[:required])) +
+      @template.content_tag(:dd, file_field(method, options.except(:required)), :id => 'file_field')
     end
   end
   
   def dl_submit(*params)
-    @template.content_tag('dt', ' ') +
-    @template.content_tag('dd', submit(*params), :class => "buttons")
+    @template.content_tag(:dt, ' ') +
+    @template.content_tag(:dd, submit(*params), :class => "buttons")
   end
   
   def dl_fckeditor(method, options = {})
     options[:toolbarSet] = 'MMH'
     dd_content = @template.fckeditor_textarea(@object_name, method, options.except(:required, :text))
 
-    @template.content_tag('dt', label_for(method, options.except(:required, :toolbarSet)) + required_label(options[:required])) + 
-    @template.content_tag('dd', dd_content)
+    @template.content_tag(:dt, label_for(method, options.except(:required, :toolbarSet)) + required_label(options[:required])) + 
+    @template.content_tag(:dd, dd_content)
   end
   
   def dl_create_or_update_button(create_cancel_url = nil, update_cancel_url = nil, create_text = nil, update_text = nil)
     dd_content = submit(object.new_record? ? (create_text || "Create") : (update_text || "Update"))
     dd_content += " or "
     
-    cancel_url = if object.new_record?
-      create_cancel_url
-    else
-      update_cancel_url
-    end
+    cancel_url = object.new_record? ? create_cancel_url : update_cancel_url
     cancel_url ||= @template.polymorphic_url(object)
     
     dd_content += @template.link_to("Cancel", cancel_url)
     
-    @template.content_tag('dt', ' ') +
-    @template.content_tag('dd', dd_content, :class => "buttons")
+    @template.content_tag(:dt, ' ') +
+    @template.content_tag(:dd, dd_content, :class => "buttons")
   end
   
   def dl_select(method, selections, options = {}, html_options = {})
     if object.respond_to?(:errors) && object.errors.respond_to?(:on) && object.errors.on(method)
-      output = @template.content_tag('dt', label_for(method, options.except(:required, :include_blank, :onchange)) + required_label(options[:required]), :class => "error")
+      errors = ""
       Array(object.errors.on(method)).each do |error|
-        output += @template.content_tag('dt', error, :class => "error msg")
+        errors += @template.content_tag(:dt, error, :class => "error msg")
       end
-      output + @template.content_tag('dd', select(method, selections, options, html_options), :class => "error")
+      output = @template.content_tag(:dt, label_for(method, options.except(:required, :include_blank, :onchange)) + required_label(options[:required]) + errors, :class => "error")
+      output + @template.content_tag(:dd, select(method, selections, options, html_options), :class => "error")
     else
-      @template.content_tag('dt', label_for(method, options.except(:required, :include_blank, :onchange)) + required_label(options[:required])) +
-      @template.content_tag('dd', select(method, selections, options, html_options))
+      @template.content_tag(:dt, label_for(method, options.except(:required, :include_blank, :onchange)) + required_label(options[:required])) +
+      @template.content_tag(:dd, select(method, selections, options, html_options))
     end
   end
 
   def dl_country_select(method, priority_countries = nil, options = {}, html_options = {})
-    @template.content_tag('dt', label_for(method, options.except(:required)) + required_label(options[:required])) +
-    @template.content_tag('dd', country_select(method, priority_countries, options, html_options))
+    @template.content_tag(:dt, label_for(method, options.except(:required)) + required_label(options[:required])) +
+    @template.content_tag(:dd, country_select(method, priority_countries, options, html_options))
   end
 
   def dl_fields_for(object_name, *args, &proc)
